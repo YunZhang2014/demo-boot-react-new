@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Test</title>
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.css">
+
+
+</head>
+<body>
+
+
+
+<div class="container">
+
+    <!--contents for react-->
+    <div id="root"></div>
+
+    <script src="https://fb.me/react-15.0.1.js"></script>
+    <script src="https://fb.me/react-dom-15.0.1.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.23/browser.min.js"></script>
+
+    <script src="js/jquery.js"></script>
+    <script src="js/bootstrap.js"></script>
+
+    <script type="text/babel">
+
+        class App extends React.Component {
+
+            constructor(props) {
+                super(props);
+                this.state = {branches: []};
+            }
+
+            componentDidMount() {
+                var self = this;
+                $.getJSON("http://localhost:8080/getBranches",{sorted:true},function (data) {
+                    self.setState({branches:data});
+                });
+            }
+
+            render() {
+                return (
+                    <div className="container">
+                        <div className="row">
+                            <div>
+                                <BranchControl branches={this.state.branches} postUrl="http://httpbin.org/post" getUrl="http://httpbin.org/get"/>
+                            </div>
+                        </div>
+
+                        <div className="row">
+                            <BranchList branches={this.state.branches}/>
+                        </div>
+
+                    </div>
+
+                )
+            }
+        }
+
+
+        class BranchList extends React.Component{
+            render() {
+                var rows = [];
+                const branches = this.props.branches;
+                for (var i = 0; i < branches.length; i++) {
+                    var branch = branches[i];
+                    rows.push(<Branch branch={branch}/>);
+                }
+                return (
+                        <table className="table">
+                            <tbody>
+                            <tr>
+                                <th>Latitude</th>
+                                <th>Longitude</th>
+                                <th>Title</th>
+                                <th>Address</th>
+                            </tr>
+                            {rows}
+                            </tbody>
+                        </table>
+                )
+            }
+        }
+
+        class Branch extends React.Component{
+            render(){
+                return (
+                        <tr>
+                            <td>{this.props.branch.latitude}</td>
+                            <td>{this.props.branch.longitude}</td>
+                            <td>{this.props.branch.title}</td>
+                            <td>{this.props.branch.address}</td>
+                        </tr>
+                )
+            }
+        }
+        
+        class BranchControl extends React.Component{
+            constructor(props){
+                super(props);
+                this.state = {response:"response 1"};
+                this.updateState = this.updateState.bind(this);
+            }
+
+            updateState(){
+                //this.state.response = "test 2";
+            }
+
+            render(){
+                var response = this.state.response;
+                return (
+                    <div>
+                        <div className="col-xs-12">
+                            <label htmlFor="url">URL</label>
+                            <input type="text" id="url" defaultValue={this.props.postUrl}/>
+                            <button onClick = {this.updateState}>Post</button>
+                            <button onClick = {this.updateState}>Get</button>
+                        </div>
+                        <div className="col-xs-12">
+                            {response}
+                        </div>
+                    </div>
+                )
+            }
+        }
+        
+
+        ReactDOM.render(
+                <App />, document.getElementById('root')
+        );
+    </script>
+
+
+</body>
+</html>
