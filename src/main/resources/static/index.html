@@ -100,11 +100,25 @@
             constructor(props){
                 super(props);
                 this.state = {response:"response 1"};
-                this.updateState = this.updateState.bind(this);
+                this.onGetClick = this.onGetClick.bind(this);
+                this.onPostClick = this.onPostClick.bind(this);
+
             }
 
-            updateState(){
-                //this.state.response = "test 2";
+            onPostClick(){
+                var self = this;
+
+                $.post(this.props.postUrl,{data:JSON.stringify(this.props.branches)},function (data) {
+                    self.setState({response:data});
+                },"text");
+
+            }
+
+            onGetClick(){
+                var self = this;
+                $.getJSON(this.props.getUrl,null,function (data) {
+                    self.setState({response:JSON.stringify(data)});
+                });
             }
 
             render(){
@@ -114,8 +128,8 @@
                         <div className="col-xs-12">
                             <label htmlFor="url">URL</label>
                             <input type="text" id="url" defaultValue={this.props.postUrl}/>
-                            <button onClick = {this.updateState}>Post</button>
-                            <button onClick = {this.updateState}>Get</button>
+                            <button onClick = {this.onPostClick}>Post</button>
+                            <button onClick = {this.onGetClick}>Get</button>
                         </div>
                         <div className="col-xs-12">
                             {response}
